@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EDA Report — Employee Dataset</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Source+Code+Pro:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --primary: #1A237E;
+    --accent: #E53935;
+    --secondary: #00ACC1;
+    --success: #43A047;
+    --warning: #F57C00;
+    --bg: #F8F9FC;
+    --card: #FFFFFF;
+    --text: #1C1C2E;
+    --muted: #6B7280;
+    --border: #E5E7EB;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  /* COVER */
+  .cover {
+    background: linear-gradient(135deg, #0D1B6E 0%, #1A237E 40%, #283593 70%, #1565C0 100%);
+    color: white;
+    padding: 80px 60px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute; top: -80px; right: -80px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .cover::after {
+    content: '';
+    position: absolute; bottom: -60px; left: 200px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(0,172,193,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .cover-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #90CAF9;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+  .cover h1 {
+    font-family: 'Merriweather', serif;
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 16px;
+    position: relative; z-index: 1;
+  }
+  .cover h1 span { color: #64B5F6; }
+  .cover .subtitle {
+    font-size: 18px;
+    opacity: 0.8;
+    margin-bottom: 40px;
+    font-weight: 300;
+    position: relative; z-index: 1;
+  }
+  .cover-meta {
+    display: flex; gap: 32px; flex-wrap: wrap;
+    position: relative; z-index: 1;
+  }
+  .cover-meta-item { font-size: 13px; opacity: 0.7; }
+  .cover-meta-item strong { display: block; opacity: 1; font-size: 15px; color: #90CAF9; }
+
+  /* STATS BAR */
+  .stats-bar {
+    background: var(--primary);
+    display: flex; justify-content: space-around; flex-wrap: wrap;
+    padding: 28px 40px;
+    gap: 16px;
+  }
+  .stat-item { text-align: center; color: white; }
+  .stat-num { font-size: 32px; font-weight: 700; color: #64B5F6; font-family: 'Source Code Pro', monospace; }
+  .stat-label { font-size: 11px; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+  /* CONTENT */
+  .container { max-width: 1100px; margin: 0 auto; padding: 48px 32px; }
+
+  .section { margin-bottom: 56px; }
+  .section-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 28px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--border);
+  }
+  .section-num {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--primary); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px; flex-shrink: 0;
+  }
+  .section-title { font-size: 22px; font-weight: 700; color: var(--primary); }
+
+  /* CARDS */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .card-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+  /* INSIGHT CARDS */
+  .insight-card {
+    background: var(--card);
+    border-radius: 10px;
+    border-left: 4px solid var(--primary);
+    padding: 16px 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .insight-card.red   { border-color: var(--accent); }
+  .insight-card.teal  { border-color: var(--secondary); }
+  .insight-card.green { border-color: var(--success); }
+  .insight-card.amber { border-color: var(--warning); }
+  .insight-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 4px; font-weight: 600; }
+  .insight-value { font-size: 22px; font-weight: 700; font-family: 'Source Code Pro', monospace; color: var(--primary); }
+  .insight-card.red   .insight-value { color: var(--accent); }
+  .insight-card.teal  .insight-value { color: var(--secondary); }
+  .insight-card.green .insight-value { color: var(--success); }
+  .insight-card.amber .insight-value { color: var(--warning); }
+  .insight-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* IMAGE */
+  .fig-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .fig-wrap img { width: 100%; display: block; }
+  .fig-caption {
+    padding: 12px 20px;
+    font-size: 13px; color: var(--muted);
+    border-top: 1px solid var(--border);
+    background: #FAFAFA;
+  }
+  .fig-caption strong { color: var(--text); }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { background: var(--primary); color: white; padding: 10px 14px; text-align: left; font-weight: 600; font-size: 12px; letter-spacing: 0.5px; }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tr:nth-child(even) td { background: #F8F9FC; }
+  tr:last-child td { border-bottom: none; }
+  .badge {
+    display: inline-block; padding: 3px 10px; border-radius: 12px;
+    font-size: 11px; font-weight: 600;
+  }
+  .badge-blue  { background: #E3F2FD; color: #1565C0; }
+  .badge-green { background: #E8F5E9; color: #2E7D32; }
+  .badge-red   { background: #FFEBEE; color: #C62828; }
+  .badge-amber { background: #FFF8E1; color: #E65100; }
+  .badge-teal  { background: #E0F7FA; color: #00695C; }
+
+  /* FINDINGS */
+  .findings-list { list-style: none; display: grid; gap: 14px; }
+  .findings-list li {
+    display: flex; gap: 14px; align-items: flex-start;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .find-icon {
+    font-size: 20px; line-height: 1; flex-shrink: 0; margin-top: 2px;
+  }
+  .find-title { font-weight: 600; margin-bottom: 2px; }
+  .find-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+  /* CONCLUSION */
+  .conclusion-box {
+    background: linear-gradient(135deg, #E8EAF6 0%, #E3F2FD 100%);
+    border: 1px solid #C5CAE9;
+    border-radius: 12px;
+    padding: 28px 32px;
+  }
+  .conclusion-box h3 { color: var(--primary); margin-bottom: 10px; font-size: 18px; }
+  .conclusion-box p { color: #37474F; font-size: 14px; line-height: 1.8; }
+
+  /* FOOTER */
+  .footer {
+    background: var(--primary); color: rgba(255,255,255,0.6);
+    text-align: center; padding: 24px;
+    font-size: 12px; letter-spacing: 0.5px;
+  }
+  .footer strong { color: white; }
+
+  @media (max-width: 700px) {
+    .card-grid, .card-grid-3 { grid-template-columns: 1fr; }
+    .cover { padding: 48px 24px 40px; }
+    .cover h1 { font-size: 28px; }
+    .container { padding: 32px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="cover-tag">Internship Project</div>
+  <h1>Exploratory Data Analysis<br><span>Employee Performance Dataset</span></h1>
+  <p class="subtitle">Uncovering patterns in salary, performance, and job satisfaction</p>
+  <div class="cover-meta">
+    <div class="cover-meta-item"><strong>Dataset</strong>Employee Performance & Salary</div>
+    <div class="cover-meta-item"><strong>Records</strong>500 Employees</div>
+    <div class="cover-meta-item"><strong>Features</strong>10 Variables</div>
+    <div class="cover-meta-item"><strong>Date</strong>June 2026</div>
+  </div>
+</div>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat-item"><div class="stat-num">500</div><div class="stat-label">Employees</div></div>
+  <div class="stat-item"><div class="stat-num">10</div><div class="stat-label">Features</div></div>
+  <div class="stat-item"><div class="stat-num">5</div><div class="stat-label">Departments</div></div>
+  <div class="stat-item"><div class="stat-num">₹69,529</div><div class="stat-label">Avg Salary</div></div>
+  <div class="stat-item"><div class="stat-num">r=0.786</div><div class="stat-label">Exp-Salary Corr</div></div>
+  <div class="stat-item"><div class="stat-num">25</div><div class="stat-label">Missing Values</div></div>
+</div>
+
+<div class="container">
+
+  <!-- SECTION 1: INTRODUCTION -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <div class="section-title">Introduction & Dataset Overview</div>
+    </div>
+    <div class="card">
+      <p>This report presents a comprehensive Exploratory Data Analysis (EDA) of an <strong>Employee Performance and Salary dataset</strong> containing 500 records across 10 features. The analysis aims to uncover relationships between employee demographics, education, experience, and key performance indicators including salary and job satisfaction.</p>
+      <br>
+      <div class="card-grid-3" style="margin-top: 16px;">
+        <div>
+          <p style="font-size:13px; color:var(--muted); font-weight:600; margin-bottom:8px;">NUMERICAL FEATURES</p>
+          <p style="font-size:13px;">Age, Experience_Years, Salary, Performance_Score, Job_Satisfaction</p>
+        </div>
+        <div>
+          <p style="font-size:13px; color:var(--muted); font-weight:600; margin-bottom:8px;">CATEGORICAL FEATURES</p>
+          <p style="font-size:13px;">Gender, Education, Department, City, EmployeeID</p>
+        </div>
+        <div>
+          <p style="font-size:13px; color:var(--muted); font-weight:600; margin-bottom:8px;">DATA QUALITY</p>
+          <p style="font-size:13px;">15 missing in Salary, 10 in Job_Satisfaction — handled via median imputation. Zero duplicates.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: STATISTICAL SUMMARY -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <div class="section-title">Statistical Summary</div>
+    </div>
+    <div class="card-grid" style="margin-bottom:20px;">
+      <div class="insight-card">        <div class="insight-label">Average Salary</div><div class="insight-value">₹69,529</div><div class="insight-sub">Std Dev: ₹18,534 | Range: ₹25K–₹1.24L</div></div>
+      <div class="insight-card red">    <div class="insight-label">Average Age</div><div class="insight-value">34.7 yrs</div><div class="insight-sub">Min: 18 | Max: 65</div></div>
+      <div class="insight-card teal">   <div class="insight-label">Avg Experience</div><div class="insight-value">16.3 yrs</div><div class="insight-sub">Std Dev: 9.3 yrs</div></div>
+      <div class="insight-card green">  <div class="insight-label">Avg Performance</div><div class="insight-value">3.36 / 5</div><div class="insight-sub">Median: 3.0</div></div>
+      <div class="insight-card amber">  <div class="insight-label">Avg Job Satisfaction</div><div class="insight-value">3.37 / 5</div><div class="insight-sub">Median: 3.0</div></div>
+      <div class="insight-card">        <div class="insight-label">Salary Skewness</div><div class="insight-value">Slight +ve</div><div class="insight-sub">Right tail due to senior employees</div></div>
+    </div>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr><th>Feature</th><th>Mean</th><th>Median</th><th>Std Dev</th><th>Min</th><th>Max</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Age</strong></td><td>34.7</td><td>35.0</td><td>9.5</td><td>18</td><td>65</td></tr>
+          <tr><td><strong>Experience (yrs)</strong></td><td>16.3</td><td>16.0</td><td>9.3</td><td>0</td><td>40</td></tr>
+          <tr><td><strong>Salary (₹)</strong></td><td>69,529</td><td>67,955</td><td>18,534</td><td>25,000</td><td>1,24,402</td></tr>
+          <tr><td><strong>Performance Score</strong></td><td>3.36</td><td>3.0</td><td>1.03</td><td>1</td><td>5</td></tr>
+          <tr><td><strong>Job Satisfaction</strong></td><td>3.37</td><td>3.0</td><td>1.28</td><td>1</td><td>5</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 3: DISTRIBUTIONS -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <div class="section-title">Feature Distributions</div>
+    </div>
+    <div class="fig-wrap">
+      <img src="../outputs/fig1_distributions.png" alt="Distributions"/>
+      <div class="fig-caption"><strong>Figure 1:</strong> Histograms with KDE curves for all numerical features. Dashed black = Mean, Dotted red = Median. Salary shows a slight right skew; Age and Experience follow near-normal distributions.</div>
+    </div>
+    <br>
+    <div class="fig-wrap">
+      <img src="../outputs/fig2_categoricals.png" alt="Categoricals"/>
+      <div class="fig-caption"><strong>Figure 2:</strong> Bar charts for categorical features. Engineering dominates at 30% of employees. Bachelors-degree holders are the majority (45%). Gender split is roughly 55:45 Male:Female.</div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: CORRELATIONS -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <div class="section-title">Correlation Analysis</div>
+    </div>
+    <div class="fig-wrap" style="margin-bottom:20px;">
+      <img src="../outputs/fig3_correlation_heatmap.png" alt="Correlation Heatmap"/>
+      <div class="fig-caption"><strong>Figure 3:</strong> Pearson correlation heatmap of numerical features. Strong positive correlations observed between Experience–Salary (r=0.786) and Performance–Satisfaction (r=0.788).</div>
+    </div>
+
+    <div class="card-grid-3">
+      <div class="insight-card green">
+        <div class="insight-label">Experience ↔ Salary</div>
+        <div class="insight-value">r = 0.786</div>
+        <div class="insight-sub">Strong positive correlation (p &lt; 0.001)</div>
+      </div>
+      <div class="insight-card teal">
+        <div class="insight-label">Education ↔ Salary</div>
+        <div class="insight-value">r = 0.402</div>
+        <div class="insight-sub">Moderate positive correlation (p &lt; 0.001)</div>
+      </div>
+      <div class="insight-card amber">
+        <div class="insight-label">Performance ↔ Satisfaction</div>
+        <div class="insight-value">r = 0.788</div>
+        <div class="insight-sub">Strong positive correlation (p &lt; 0.001)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5: SALARY ANALYSIS -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <div class="section-title">Salary Analysis</div>
+    </div>
+    <div class="fig-wrap" style="margin-bottom:20px;">
+      <img src="../outputs/fig4_salary_analysis.png" alt="Salary Analysis"/>
+      <div class="fig-caption"><strong>Figure 4:</strong> (Left) Average salary by department — Engineering leads significantly. (Right) Scatter plot of Salary vs Experience, colored by Performance Score, with linear regression trend line.</div>
+    </div>
+    <div class="card">
+      <table>
+        <thead><tr><th>Department</th><th>Avg Salary (₹)</th><th>Avg Performance</th><th>Rank</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Engineering</strong></td><td>80,096</td><td>3.50</td><td><span class="badge badge-blue">🥇 #1</span></td></tr>
+          <tr><td><strong>Finance</strong></td><td>72,730</td><td>3.39</td><td><span class="badge badge-green">#2</span></td></tr>
+          <tr><td><strong>Marketing</strong></td><td>64,754</td><td>3.37</td><td><span class="badge badge-teal">#3</span></td></tr>
+          <tr><td><strong>HR</strong></td><td>62,072</td><td>3.09</td><td><span class="badge badge-amber">#4</span></td></tr>
+          <tr><td><strong>Sales</strong></td><td>61,836</td><td>3.32</td><td><span class="badge badge-red">#5</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 6: PERFORMANCE & SATISFACTION -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <div class="section-title">Performance & Satisfaction</div>
+    </div>
+    <div class="fig-wrap" style="margin-bottom:20px;">
+      <img src="../outputs/fig5_performance_satisfaction.png" alt="Performance Satisfaction"/>
+      <div class="fig-caption"><strong>Figure 5:</strong> (Left) Avg performance by department. (Center) Salary distribution across education levels — PhD holders earn substantially more. (Right) Cross-tabulation heatmap of Performance vs Satisfaction scores.</div>
+    </div>
+  </div>
+
+  <!-- SECTION 7: DEMOGRAPHICS -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <div class="section-title">Demographic Insights</div>
+    </div>
+    <div class="fig-wrap" style="margin-bottom:20px;">
+      <img src="../outputs/fig6_demographics.png" alt="Demographics"/>
+      <div class="fig-caption"><strong>Figure 6:</strong> (Left) Mean and median salary comparison by gender. (Right) Employee distribution across cities — Mumbai and Delhi account for ~50% of workforce.</div>
+    </div>
+  </div>
+
+  <!-- SECTION 8: KEY FINDINGS -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">8</div>
+      <div class="section-title">Key Findings</div>
+    </div>
+    <ul class="findings-list">
+      <li>
+        <div class="find-icon">📈</div>
+        <div><div class="find-title">Experience is the Strongest Salary Predictor</div><div class="find-desc">Pearson correlation of r = 0.786 between Experience and Salary indicates that each additional year of experience is associated with approximately ₹1,500 increase in annual salary.</div></div>
+      </li>
+      <li>
+        <div class="find-icon">🎓</div>
+        <div><div class="find-title">Education Level Moderately Impacts Salary</div><div class="find-desc">PhD holders earn on average ₹24,000–₹32,000 more than High School graduates. Education correlates with salary at r = 0.402, confirming a meaningful but secondary effect compared to experience.</div></div>
+      </li>
+      <li>
+        <div class="find-icon">🏆</div>
+        <div><div class="find-title">Engineering Department Leads in Both Salary and Performance</div><div class="find-desc">Engineering employees earn an average of ₹80,096 — 29% above the HR/Sales departments — and also score highest in average performance (3.50/5.00).</div></div>
+      </li>
+      <li>
+        <div class="find-icon">😊</div>
+        <div><div class="find-title">Performance and Satisfaction Are Strongly Linked</div><div class="find-desc">r = 0.788 correlation between Performance Score and Job Satisfaction suggests that high performers are significantly more satisfied with their jobs, pointing to a virtuous cycle of engagement.</div></div>
+      </li>
+      <li>
+        <div class="find-icon">⚖️</div>
+        <div><div class="find-title">Gender Salary Gap Is Minimal</div><div class="find-desc">Mean salaries for Male (≈₹70,100) and Female (≈₹68,900) employees are close, suggesting no significant gender-based pay disparity in this dataset after controlling for other factors.</div></div>
+      </li>
+      <li>
+        <div class="find-icon">🗺️</div>
+        <div><div class="find-title">Mumbai and Delhi Concentrate 50% of the Workforce</div><div class="find-desc">The workforce is geographically concentrated, with Mumbai (~25%) and Delhi (~25%) together accounting for half of all employees. Bangalore follows at ~20%.</div></div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- SECTION 9: CONCLUSION -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">9</div>
+      <div class="section-title">Conclusion & Recommendations</div>
+    </div>
+    <div class="conclusion-box">
+      <h3>Analytical Summary</h3>
+      <p>This EDA reveals that <strong>experience and education are the two most influential drivers of employee salary</strong>, with experience carrying nearly twice the predictive weight. The strong link between performance scores and job satisfaction points to a positive reinforcement loop that HR teams can leverage. Engineering stands out as the highest-performing and highest-compensated department.</p>
+      <br>
+      <p><strong>Recommendations:</strong> Organizations should invest in skill-development programs to accelerate functional experience, particularly for junior employees. The positive performance–satisfaction relationship suggests that recognizing high performers with non-monetary rewards can further boost satisfaction scores. Salary benchmarking across cities should be reviewed, as geographic concentration in Mumbai and Delhi may create cost-of-living disparities.</p>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <strong>Exploratory Data Analysis Report</strong> — Employee Performance Dataset &nbsp;|&nbsp; Generated June 2026 &nbsp;|&nbsp; Internship Project
+</div>
+
+</body>
+</html>
